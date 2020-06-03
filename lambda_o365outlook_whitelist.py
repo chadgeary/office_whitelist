@@ -1,6 +1,6 @@
 import boto3
 import os
-from botocore.vendored import requests
+import requests
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):

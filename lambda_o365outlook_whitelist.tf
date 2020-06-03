@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "o365_pdoc" {
     sid                      = "1"
     actions                  = [
       "ec2:AuthorizeSecurityGroupEgress",
-      "ec2:RevokeSecurtiyGroupEgress"
+      "ec2:RevokeSecurityGroupEgress"
     ]
     resources                = [
       data.aws_security_group.o365_sg.arn
@@ -71,12 +71,12 @@ resource "aws_lambda_function" "o365_lambda" {
   filename                 = "lambda_o365outlook_whitelist.zip"
   function_name            = "lambda_o365outlook_whitelist"
   role                     = aws_iam_role.o365_iamrole.arn
-  handler                  = "lambda_o365outlook_whitelist.py"
+  handler                  = "lambda_o365outlook_whitelist.lambda_handler"
   source_code_hash         = filebase64sha256("lambda_o365outlook_whitelist.zip")
-  runtime                  = "python3.6"
+  runtime                  = "python3.8"
   environment {
     variables                = {
-      security_group_id        = var.security_group_id
+      SECURITY_GROUP_ID        = var.security_group_id
     }
   }
 }
