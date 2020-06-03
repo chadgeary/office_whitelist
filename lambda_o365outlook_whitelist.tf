@@ -14,12 +14,24 @@ provider "aws" {
   profile                  = var.aws_profile
 }
 
-variable "security_group_id" {
+variable "o365_group_id" {
+  type                     = string
+}
+
+variable "lambda_group_id" {
+  type                     = string
+}
+
+variable "lambda_subnet_id" {
   type                     = string
 }
 
 data "aws_security_group" "o365_sg" {
-  id                         = var.security_group_id
+  id                         = var.o365_group_id
+}
+
+data "aws_security_group" "lambda_sg" {
+  id                         = var.lambda_group_id
 }
 
 data "aws_iam_policy_document" "o365_pdoc" {
@@ -27,10 +39,25 @@ data "aws_iam_policy_document" "o365_pdoc" {
     sid                      = "1"
     actions                  = [
       "ec2:AuthorizeSecurityGroupEgress",
-      "ec2:RevokeSecurityGroupEgress"
+      "ec2:RevokeSecurityGroupEgress",
+      "ec2:DescribeSecurityGroups"
     ]
     resources                = [
       data.aws_security_group.o365_sg.arn
+    ]
+  }
+  statement {
+    sid                      = "2"
+    actions                  = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources                = [
+      "*"
     ]
   }
 }
@@ -73,10 +100,15 @@ resource "aws_lambda_function" "o365_lambda" {
   role                     = aws_iam_role.o365_iamrole.arn
   handler                  = "lambda_o365outlook_whitelist.lambda_handler"
   source_code_hash         = filebase64sha256("lambda_o365outlook_whitelist.zip")
-  runtime                  = "python3.8"
+  runtime                  = "python3.6"
+  timeout                  = 60
+  vpc_config {
+    security_group_ids       = [var.lambda_group_id]
+    subnet_ids               = [var.lambda_subnet_id]
+  }
   environment {
     variables                = {
-      SECURITY_GROUP_ID        = var.security_group_id
+      SECURITY_GROUP_ID        = var.o365_group_id
     }
   }
 }
