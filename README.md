@@ -1,13 +1,13 @@
 # Reference
-AWS lambda function w/ IAM policy/role to:
+AWS lambda function invoked via Cloudwatch to:
 1. fetch Microsoft's office365 endpoint list
 2. match on endpoint url/port
 3. update a security group's egress to permit access (permit new + revoke old)
 
 # Notes
-- Requires/uses Terraform (must be pre-installed).
-- Requires/uses AWS credentials provided by environment.
-- Defaults assume target egress is outlook (SMTP 25/tcp).
+- Defaults (in .tf) target Outlook (SMTP 25/tcp)
+- Default schedule (in .tf) is Midnight (00:00) GMT, daily
+- Requires/uses Terraform which uses environment AWS credentials (e.g. ~/.aws/credentials)
 - Modifies egress rules ONLY if matching port number, port protocol, and rule description
 
 # Deploy
