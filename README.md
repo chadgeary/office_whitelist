@@ -1,9 +1,15 @@
 # Reference
-AWS lambda & associated IAM policy/role to fetch Microsoft's office365 SMTP server subnets and update a security group (to permit smtp [tcp/25]). Uses terraform.
+AWS lambda function w/ IAM policy/role to:
+1. fetch Microsoft's office365 endpoint list
+2. match on endpoint url/port
+3. update a security group's egress to permit access (permit new + revoke old)
+
+- Builds via terraform.
+- Defaults assume target egress is outlook 25/tcp (SMTP).
 
 # Requires
-- terraform installed
-- AWS credentials provided by environment
+- Terraform installed.
+- AWS credentials provided by environment.
 
 # Deploy
 ```

@@ -1,8 +1,9 @@
 # A terraform configuration for a lambda function (and the associated IAM role)
-# to fetch microsoft office365 outlook smtp servers
-# then update a security group's egress to permit 25/tcp (SMTP)
-# for those subnets
+# to fetch microsoft office365 web endpoints
+# then update a security group's egress to permit access (e.g. mail.protection.outlook.com smtp 25/tcp)
+# with the fetched subnets
 
+# defaults assume outlook 25/tcp (SMTP)
 variable "aws_region" {
   type                     = string
 }
@@ -20,6 +21,31 @@ variable "owl_group_id" {
   type                     = string
 }
 
+variable "owl_endpoints_url" {
+  type                     = string
+  default                  = "https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7"
+}
+
+variable "owl_service_url" {
+  type                     = string
+  default                  = "*.mail.protection.outlook.com"
+}
+
+variable "owl_rule_description" {
+  type                     = string
+  default                  = "OWL_OUTLOOK"
+}
+
+variable "owl_port_number" {
+  type                     = string
+  default                  = "25"
+}
+
+variable "owl_port_protocol" {
+  type                     = string
+  default                  = "tcp"
+}
+
 data "aws_security_group" "owl_sg" {
   id                         = var.owl_group_id
 }
@@ -30,9 +56,14 @@ data "aws_iam_policy_document" "owl_pdoc" {
     actions                  = [
       "ec2:AuthorizeSecurityGroupEgress",
       "ec2:RevokeSecurityGroupEgress",
-      "ec2:CreateNetworkInterface",
-      "ec2:DescribeNetworkInterfaces",
-      "ec2:DeleteNetworkInterface",
+    ]
+    resources                = [
+      data.aws_security_group.owl_sg.arn
+    ]
+  }
+  statement {
+    sid                      = "2"
+    actions                  = [
       "ec2:DescribeSecurityGroups",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
@@ -45,13 +76,13 @@ data "aws_iam_policy_document" "owl_pdoc" {
 }
 
 resource "aws_iam_policy" "owl_policy" {
-  name                     = "outlook_whitelist"
+  name                     = "office_whitelist"
   path                     = "/"
   policy                   = data.aws_iam_policy_document.owl_pdoc.json
 }
 
 resource "aws_iam_role" "owl_iamrole" {
-  name                     = "outlook_whitelist"
+  name                     = "office_whitelist"
   path                     = "/"  
   assume_role_policy       = <<EOF
 {
@@ -71,22 +102,26 @@ EOF
 }
 
 resource "aws_iam_policy_attachment" "owl_policy_attach" {
-  name                     = "outlook_whitelist"
+  name                     = "office_whitelist"
   roles                    = [aws_iam_role.owl_iamrole.name]
   policy_arn               = aws_iam_policy.owl_policy.arn
 }
 
 resource "aws_lambda_function" "owl_lambda" {
-  filename                 = "outlook_whitelist.zip"
-  function_name            = "outlook_whitelist"
+  filename                 = "office_whitelist.zip"
+  function_name            = "office_whitelist"
   role                     = aws_iam_role.owl_iamrole.arn
-  handler                  = "outlook_whitelist.lambda_handler"
-  source_code_hash         = filebase64sha256("outlook_whitelist.zip")
+  handler                  = "office_whitelist.lambda_handler"
+  source_code_hash         = filebase64sha256("office_whitelist.zip")
   runtime                  = "python3.6"
   timeout                  = 60
   environment {
     variables                = {
       SECURITY_GROUP_ID        = var.owl_group_id
+      OWL_ENDPOINTS_URL        = var.owl_endpoints_url
+      OWL_SERVICE_URL          = var.owl_service_url
+      OWL_PORT_PROTOCOL        = var.owl_port_protocol
+      OWL_PORT_NUMBER          = var.owl_port_number
     }
   }
 }
