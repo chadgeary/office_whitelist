@@ -28,13 +28,16 @@ var.owl_group_id
 
 # Output Example
 ```
-Function Logs:
-START RequestId: c21b8f95-e506-4a1f-8a24-dd1431877501 Version: $LATEST
-200
-outlook: [40.92.0.0/15, 40.107.0.0/16, 52.100.0.0/14, 104.47.0.0/17, 2a01:111:f400::/48, 2a01:111:f403::/48]
-existing: [40.107.0.0/16, 104.47.0.0/17, 52.100.0.0/14, 169.254.0.0/24]
-adding: [40.92.0.0/15][2a01:111:f403::/48]
-removing: [169.254.0.0/24][]
-END RequestId: c21b8f95-e506-4a1f-8a24-dd1431877501
-REPORT RequestId: c21b8f95-e506-4a1f-8a24-dd1431877501	Duration: 4607.93 ms	Billed Duration: 4700 ms	Memory Size: 128 MB	Max Memory Used: 77 MB	Init Duration: 168.71 ms	
+START RequestId: 4a087cdc-e363-15fc-bd2d-fe251241e9f1 Version: $LATEST
+endpoints_fetch_response: 200
+service_url: *.mail.protection.outlook.com
+service_subnets: [40.92.0.0/15, 40.107.0.0/16, 52.100.0.0/14, 104.47.0.0/17, 2a01:111:f400::/48, 2a01:111:f403::/48]
+Found existing subnets matching egress port_protocol: tcp + port_number: 25 + description: OWL_OUTLOOK
+[40.92.0.0/15, 40.107.0.0/16, 104.47.0.0/17, 52.100.0.0/14, 172.16.4.0/23][2a01:111:f400::/48]
+adding v4: []
+adding v6: [2a01:111:f403::/48]
+removing v4: [172.16.4.0/23]
+removing v6: []
+END RequestId: 4a087cdc-e363-15fc-bd2d-fe251241e9f1
+REPORT RequestId: 4a087cdc-e363-15fc-bd2d-fe251241e9f1	Duration: 4465.68 ms	Billed Duration: 4500 ms	Memory Size: 128 MB	Max Memory Used: 78 MB	Init Duration: 158.83 ms	
 ```
