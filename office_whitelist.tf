@@ -21,6 +21,11 @@ variable "owl_group_id" {
   type                     = string
 }
 
+variable "owl_event_schedule" {
+  type                     = string
+  default                  = "cron(0 0 * * ? *)"
+}
+
 variable "owl_endpoints_url" {
   type                     = string
   default                  = "https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7"
@@ -125,4 +130,32 @@ resource "aws_lambda_function" "owl_lambda" {
       OWL_RULE_DESCRIPTION     = var.owl_rule_description
     }
   }
+}
+
+resource "aws_cloudwatch_event_rule" "owl_cloudwatch_event_rule" {
+  name                     = "office_whitelist"
+  description              = "Triggers the office_whitelist lambda"
+  schedule_expression      = var.owl_event_schedule
+}
+
+resource "aws_cloudwatch_event_target" "owl_cloudwatch_event_target" {
+  rule                     = aws_cloudwatch_event_rule.owl_cloudwatch_event_rule.name
+  target_id                = aws_lambda_alias.owl_lambda_alias.name
+  arn                      = aws_lambda_alias.owl_lambda_alias.arn
+}
+
+resource "aws_lambda_permission" "owl_lambda_allow_cloudwatch" {
+  statement_id             = "AWSEvents_office_whitelist_office_whitelist_alias"
+  action                   = "lambda:InvokeFunction"
+  function_name            = aws_lambda_function.owl_lambda.function_name
+  principal                = "events.amazonaws.com"
+  source_arn               = aws_cloudwatch_event_rule.owl_cloudwatch_event_rule.arn
+  qualifier                = aws_lambda_alias.owl_lambda_alias.name
+}
+
+resource "aws_lambda_alias" "owl_lambda_alias" {
+  name                     = "office_whitelist_alias"
+  description              = "Alias for cloudwatch invoke lambda"
+  function_name            = aws_lambda_function.owl_lambda.function_name
+  function_version         = "$LATEST"
 }
