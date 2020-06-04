@@ -122,6 +122,7 @@ resource "aws_lambda_function" "owl_lambda" {
       OWL_SERVICE_URL          = var.owl_service_url
       OWL_PORT_PROTOCOL        = var.owl_port_protocol
       OWL_PORT_NUMBER          = var.owl_port_number
+      OWL_RULE_DESCRIPTION     = var.owl_rule_description
     }
   }
 }
