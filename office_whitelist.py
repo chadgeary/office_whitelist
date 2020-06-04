@@ -91,7 +91,7 @@ def lambda_handler(event, context):
 
   # add ipv6
   add_subnetsv6 = [owl_service_subnet for owl_service_subnet in owl_service_subnets if (owl_service_subnet not in filtered_subnetsv6) and (':' in owl_service_subnet)]
-  print("adding: " + '[%s]' % ', '.join(map(str, add_subnetsv6))
+  print("adding: " + '[%s]' % ', '.join(map(str, add_subnetsv6)))
 
   for add_subnetv6 in add_subnetsv6:
     client.authorize_security_group_egress(
