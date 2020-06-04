@@ -8,6 +8,7 @@ AWS lambda function w/ IAM policy/role to:
 - Requires/uses Terraform (must be pre-installed).
 - Requires/uses AWS credentials provided by environment.
 - Defaults assume target egress is outlook (SMTP 25/tcp).
+- Modifies egress rules ONLY if matching port number, port protocol, and rule description
 
 # Deploy
 ```
