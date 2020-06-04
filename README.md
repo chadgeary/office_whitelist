@@ -4,12 +4,10 @@ AWS lambda function w/ IAM policy/role to:
 2. match on endpoint url/port
 3. update a security group's egress to permit access (permit new + revoke old)
 
-- Builds via terraform.
-- Defaults assume target egress is outlook 25/tcp (SMTP).
-
-# Requires
-- Terraform installed.
-- AWS credentials provided by environment.
+# Notes
+- Requires/uses Terraform (must be pre-installed).
+- Requires/uses AWS credentials provided by environment.
+- Defaults assume target egress is outlook (SMTP 25/tcp).
 
 # Deploy
 ```
