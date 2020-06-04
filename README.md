@@ -13,8 +13,19 @@ AWS lambda function w/ IAM policy/role to:
 
 # Deploy
 ```
+# begin terraform
 terraform init
 terraform apply
+
+# answer terraform variables
+var.aws_profile
+  Enter a value: default
+
+var.aws_region
+  Enter a value: us-east-2
+
+var.owl_group_id
+  Enter a value: sg-12345678
 ```
 
 # Output Example
